@@ -25,19 +25,27 @@ parser.add_argument(
     help='Path for the output file'
 )
 
-args=parser.parse_args()
+parser.add_argument(
+    '-I',
+    '--column_index',
+    type=int,
+    help='Column index to insert adjusted p-values'
+)
 
+args=parser.parse_args()
 
 def adjustFdr(df, pCol, output):
     data=pd.read_csv(df)
     pVals=data[pCol].tolist()
     U1, p=multitest.fdrcorrection(pVals, alpha=0.05, method='indep', is_sorted=False)
-    data.insert(loc=2, column="pVal_FDR", value=p, allow_duplicates=True)
-    data.to_csv(output)
+    column_index=args.column_index if args.column_index else len(data.columns)
+    data.insert(loc=column_index, column="pVal_FDR", value=p, allow_duplicates=True)
+    data.to_csv(output, index=False)
 
 input=args.input
 pCol=args.pColumn
-output=args.output
+output= args.output if args.output else './adjustedTable.csv'
+
 
 
 if __name__=='__main__':
