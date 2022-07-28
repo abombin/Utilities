@@ -32,19 +32,30 @@ parser.add_argument(
 
 args=parser.parse_args()
 
+replace_with=args.replace_with
+input=args.input
+output=args.output if args.output else 'outputFile.txt'
+replace=args.replace
+
+
 def replaceWhole(input, output, replace, replace_with):
     inputFile=open(input, 'r')
     outputFile=open(output, 'w')
     for line in inputFile:
-        outputLine=line.replace(replace, replace_with)
+        if replace_with==r'\t':
+            outArg='\t'
+        else:
+            outArg=replace_with
+        if replace==r'\t':
+            inArg='\t'
+        else:
+            inArg=replace
+        outputLine=line.replace(inArg, outArg)
         outputFile.write(outputLine)
     inputFile.close()
     outputFile.close()
 
-input=args.input
-output=args.output if args.output else 'outputFile.txt'
-replace=args.replace
-replace_with=args.w
+
 
 if __name__=='__main__':
     replaceWhole(input, output, replace, replace_with)
