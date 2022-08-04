@@ -48,12 +48,21 @@ parser.add_argument(
 )
 
 parser.add_argument(
+  "-c",
+  "--column",
+  type=str,
+  nargs="?",
+  default="location",
+  help="Column in which to fill NaN/'empy cells', default = location"
+)
+
+parser.add_argument(
   "-o",
   "--output_path",
   type=str,
   nargs="?",
   default="formatedTable.tsv",
-  help="Path to the output file. default = formatedTable.tsv"
+  help="Path to the output file, default = formatedTable.tsv"
 )
 
 # parse arguments
@@ -62,10 +71,22 @@ args=parser.parse_args()
 df=args.input_path
 separator=args.separator
 replacement=args.replace_with
+column=args.column
 output=args.output_path
 
 # main function
-def fromatData(dat, sep, rep, out):
+def fromatData(dat, sep, rep, col, out):
   meta=pd.read_csv(filepath_or_buffer=dat, sep=sep)
-  meta['location']=meta['location'].str.replace(' ', rep)
-  meta[['location']]=meta[['location']].fillna(rep)
+  meta[col]=meta[col].str.replace(' ', rep)
+  meta[[col]]=meta[[col]].fillna(rep)
+  meta['date'] = pd.to_datetime(meta.date)
+  meta['date'] = meta['date'].dt.strftime("%Y-%m-%d")
+  meta[['date_submitted']]=meta[['date']]
+  metaFilt=meta[meta['date'].notna()]
+  metaFilt.to_csv(path_or_buf=out, sep='\t', index=False)
+  
+# Run the main function
+
+if __name__=='__main__':
+  fromatData(dat=df, sep=separator, rep=replacement, col=column, out=output)
+  
